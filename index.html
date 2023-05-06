@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Corrector tool</title>
@@ -62,9 +63,8 @@
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
-            height: 10%;
             background-color: #f2f2f2;
-            padding: 10px;
+            padding: 0;
             box-sizing: border-box;
         }
 
@@ -90,6 +90,20 @@
             height: auto;
             object-fit: contain;
         }
+
+        .toggle-btn {
+            margin-left: 10px;
+            padding: 5px;
+            border: 1px solid black;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 
@@ -99,15 +113,17 @@
             <label for="section1-url">Corrector Gramatical:</label>
             <input type="text" id="section1-url" value="https://www.spellboy.com/corrector-gramatical/"
                 onchange="updateSection('section1', this.value)">
+            <button class="toggle-btn" id="1b" onclick="toggleSection('section1','1b')">Hide</button>
         </div>
         <div class="input-box">
             <label for="section2-url">Traducción:</label>
             <input type="text" id="section2-url" onchange="updateSection('section2', this.value)">
+            <button class="toggle-btn" id="2b" onclick="toggleSection('section2','2b')">Hide</button>
         </div>
         <div class="input-box">
             <label for="section3-url">Manga:</label>
             <input type="file" id="zip-file-input">
-
+            <button class="toggle-btn" id="3b" onclick="toggleSection('section3','3b')">Hide</button>
         </div>
     </div>
     <div class="container">
@@ -123,37 +139,47 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.6.0/dist/jszip.min.js"></script>
     <script>
+        // Check if the section is hidden in local storage and hide it if necessary
+        const hiddenSections = JSON.parse(localStorage.getItem('hiddenSections')) || {};
+        if (hiddenSections.section1) {
+            toggleSection('section1');
+        }
+        if (hiddenSections.section2) {
+            toggleSection('section2');
+        }
+        if (hiddenSections.section3) {
+            toggleSection('section3');
+        }
         document.getElementById("zip-file-input").addEventListener("change", () => {
-            // Clear the existing images
             document.getElementById("section3-embed").innerHTML = "";
-
-            // Load the new zip file and display its images
             loadZipFile();
         });
 
-          function loadZipFile() {
-    const zipFile = document.getElementById("zip-file-input").files[0];
-    const zip = new JSZip();
-    zip.loadAsync(zipFile).then(zip => {
-      const filenames = Object.keys(zip.files);
-      filenames.sort((a, b) => {
-        const aIndex = parseInt(a.substring(0, a.indexOf(".")));
-        const bIndex = parseInt(b.substring(0, b.indexOf(".")));
-        return aIndex - bIndex;
-      });
-      filenames.forEach(filename => {
-        const img = document.createElement("img");
-        zip.file(filename).async("blob").then(blob => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            img.src = reader.result;
-          };
-          reader.readAsDataURL(blob);
-        });
-        document.getElementById("section3-embed").appendChild(img);
-      });
-    });
-  }
+        function loadZipFile() {
+            const zipFile = document.getElementById("zip-file-input").files[0];
+            const zip = new JSZip();
+            zip.loadAsync(zipFile).then(zip => {
+                const filenames = Object.keys(zip.files);
+                filenames.sort((a, b) => {
+                    const aIndex = parseInt(a.substring(0, a.indexOf(".")));
+                    const bIndex = parseInt(b.substring(0, b.indexOf(".")));
+                    return aIndex - bIndex;
+                });
+
+                filenames.forEach(filename => {
+                    const img = document.createElement("img");
+                    zip.file(filename).async("blob").then(blob => {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            img.src = reader.result;
+                        };
+                        reader.readAsDataURL(blob);
+                    });
+                    document.getElementById("section3-embed").appendChild(img);
+                });
+            });
+        }
+
         function updateSection(sectionId, url) {
             const sectionEmbed = document.getElementById(sectionId + "-embed");
             sectionEmbed.innerHTML = '';
@@ -164,6 +190,18 @@
                 sectionEmbed.appendChild(embedElem);
             }
         }
+
+        function toggleSection(sectionId, buttonid) {
+            const section = document.querySelector(`.${sectionId}`);
+            section.classList.toggle('hidden');
+            const toggleBtn = document.getElementById(buttonid);
+            if (toggleBtn.textContent == 'Hide') {
+                toggleBtn.textContent = 'Unhide';
+            } else {
+                toggleBtn.textContent = 'Hide';
+            }
+        }
     </script>
 </body>
+
 </html>
