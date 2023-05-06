@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Extract Images from Webpage</title>
+	<style>
+		#image-container {
+			max-width: 600px; /* set the maximum width for the container */
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: center;
+		}
+
+		#image-container img {
+			max-width: 100%;
+			max-height: 100%;
+			object-fit: contain;
+			margin: 10px;
+		}
+	</style>
+</head>
+<body>
+	<label for="url-input">Enter a URL:</label>
+	<input type="text" id="url-input" placeholder="https://www.example.com">
+	<button id="submit-btn">Extract Images</button>
+
+	<div id="image-container"></div>
+
+	<script>
+		// Add click event listener to the submit button
+		document.getElementById('submit-btn').addEventListener('click', () => {
+			const url = document.getElementById('url-input').value;
+
+			// Fetch the webpage using the provided URL
+			fetch(url)
+				.then(response => response.text())
+				.then(html => {
+					// Create a new HTML document with the fetched HTML
+					const parser = new DOMParser();
+					const doc = parser.parseFromString(html, 'text/html');
+
+					// Get all the images from the fetched HTML document
+					const images = doc.querySelectorAll('img');
+
+					// Create a new HTML img element for each image and append it to the container div
+					images.forEach(image => {
+						const newImg = document.createElement('img');
+						newImg.src = image.src;
+						newImg.alt = image.alt;
+						document.getElementById('image-container').appendChild(newImg);
+					});
+				})
+				.catch(error => {
+					console.error(error);
+					alert('Error fetching webpage. Please check the URL and try again.');
+				});
+		});
+	</script>
+</body>
+</html>
