@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Corrector tool</title>
@@ -78,8 +77,18 @@
             border-radius: 5px;
         }
 
-        .section2 #docs-header-container {
-            display: none;
+        #section3-embed {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            overflow-y: auto;
+            max-height: 100%;
+        }
+
+        #section3-embed img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
         }
     </style>
 </head>
@@ -97,7 +106,8 @@
         </div>
         <div class="input-box">
             <label for="section3-url">Manga:</label>
-            <input type="text" id="section3-url" onchange="updateSection('section3', this.value)">
+            <input type="file" id="zip-file-input">
+
         </div>
     </div>
     <div class="container">
@@ -111,8 +121,35 @@
             <div class="big-section" id="section3-embed"></div>
         </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.6.0/dist/jszip.min.js"></script>
     <script>
+        document.getElementById("zip-file-input").addEventListener("change", () => {
+            // Clear the existing images
+            document.getElementById("section3-embed").innerHTML = "";
+
+            // Load the new zip file and display its images
+            loadZipFile();
+        });
+
+        function loadZipFile() {
+            const zipFile = document.getElementById("zip-file-input").files[0];
+            const zip = new JSZip();
+            zip.loadAsync(zipFile).then(zip => {
+                const filenames = Object.keys(zip.files);
+                filenames.sort();
+                filenames.forEach(filename => {
+                    const img = document.createElement("img");
+                    zip.file(filename).async("blob").then(blob => {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            img.src = reader.result;
+                        };
+                        reader.readAsDataURL(blob);
+                    });
+                    document.getElementById("section3-embed").appendChild(img);
+                });
+            });
+        }
         function updateSection(sectionId, url) {
             const sectionEmbed = document.getElementById(sectionId + "-embed");
             sectionEmbed.innerHTML = '';
@@ -125,5 +162,4 @@
         }
     </script>
 </body>
-
 </html>
