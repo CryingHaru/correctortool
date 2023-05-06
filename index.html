@@ -131,25 +131,29 @@
             loadZipFile();
         });
 
-        function loadZipFile() {
-            const zipFile = document.getElementById("zip-file-input").files[0];
-            const zip = new JSZip();
-            zip.loadAsync(zipFile).then(zip => {
-                const filenames = Object.keys(zip.files);
-                filenames.sort();
-                filenames.forEach(filename => {
-                    const img = document.createElement("img");
-                    zip.file(filename).async("blob").then(blob => {
-                        const reader = new FileReader();
-                        reader.onload = () => {
-                            img.src = reader.result;
-                        };
-                        reader.readAsDataURL(blob);
-                    });
-                    document.getElementById("section3-embed").appendChild(img);
-                });
-            });
-        }
+          function loadZipFile() {
+    const zipFile = document.getElementById("zip-file-input").files[0];
+    const zip = new JSZip();
+    zip.loadAsync(zipFile).then(zip => {
+      const filenames = Object.keys(zip.files);
+      filenames.sort((a, b) => {
+        const aIndex = parseInt(a.substring(0, a.indexOf(".")));
+        const bIndex = parseInt(b.substring(0, b.indexOf(".")));
+        return aIndex - bIndex;
+      });
+      filenames.forEach(filename => {
+        const img = document.createElement("img");
+        zip.file(filename).async("blob").then(blob => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            img.src = reader.result;
+          };
+          reader.readAsDataURL(blob);
+        });
+        document.getElementById("section3-embed").appendChild(img);
+      });
+    });
+  }
         function updateSection(sectionId, url) {
             const sectionEmbed = document.getElementById(sectionId + "-embed");
             sectionEmbed.innerHTML = '';
