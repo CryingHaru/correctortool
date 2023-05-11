@@ -1,42 +1,33 @@
-// Get the DOM elements
-const imageInput = document.getElementById('imageInput');
-const languageSelect = document.getElementById('languageSelect');
-const previewImage = document.getElementById('previewImage');
-const result = document.getElementById('result');
-const ocrButton = document.getElementById('ocrButton');
 
-// Define the Tesseract worker
-const worker = Tesseract.createWorker();
+      // Function to handle the image file selection
+      function handleImageSelect(event) {
+        var file = event.target.files[0];
 
-// Function to process the image with OCR
-const processImage = async () => {
-  try {
-    // Set the language
-    const language = languageSelect.value;
-    await worker.load();
-    await worker.loadLanguage(language);
-    await worker.initialize(language);
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var img = new Image();
+          img.onload = function () {
+            recognizeText(img, document.getElementById("languageSelect").value);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
 
-    // Get the image data
-    const file = imageInput.files[0];
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = async () => {
-      const imageData = reader.result;
+      // Function to perform OCR on the image
+      async function recognizeText(img, lang) {
+        const { data: { text } } = await Tesseract.recognize(img, lang);
+        document.getElementById("result").innerText = text;
+      }
 
-      // Display the preview image
-      previewImage.src = imageData;
+      // Attach an event listener to the file input
+      document.getElementById("imageInput").addEventListener("change", handleImageSelect);
 
-      // Process the image with OCR
-      const { data: { text } } = await worker.recognize(imageData);
-      result.innerText = text;
-    };
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-// Attach event listeners
-imageInput.addEventListener('change', processImage);
-languageSelect.addEventListener('change', processImage);
-ocrButton.addEventListener('click', processImage);
+      // Attach an event listener to the OCR button
+      document.getElementById("ocrButton").addEventListener("click", function () {
+        var img = new Image();
+        img.onload = function () {
+          recognizeText(img, document.getElementById("languageSelect").value);
+        };
+        img.src = document.getElementById("imageInput").files[0] ? URL.createObjectURL(document.getElementById("imageInput").files[0]) : "";
+      });
