@@ -3,19 +3,21 @@
 <head>
   <meta charset="utf-8">
   <title>OCR in JavaScript</title>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.4/dist/tesseract.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.5/dist/tesseract.min.js"></script>
 </head>
 <body>
   <input type="file" id="file-input">
   <img id="image-preview" width="400">
   <div id="ocr-result"></div>
+  <button id="ocr-button">Start OCR</button>
 
   <script>
     const fileInput = document.getElementById('file-input');
     const imagePreview = document.getElementById('image-preview');
     const ocrResult = document.getElementById('ocr-result');
+    const ocrButton = document.getElementById('ocr-button');
 
-    fileInput.addEventListener('change', () => {
+    ocrButton.addEventListener('click', () => {
       const file = fileInput.files[0];
       const reader = new FileReader();
 
