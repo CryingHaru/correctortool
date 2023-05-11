@@ -74,25 +74,92 @@ const processImage = async () => {
     const file = imageInput.files[0];
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = async () => {
-      const imageData = reader.result;
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>OCR App</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.5/dist/tesseract.min.js"></script>
+  </head>
+  <body>
+    <div>
+      <input type="file" id="imageInput" accept="image/*" />
+      <button id="ocrButton">Recognize Text</button>
+    </div>
+    <div>
+      <label for="languageSelect">Language:</label>
+      <select id="languageSelect">
+        <option value="eng">English</option>
+        <option value="spa">Spanish</option>
+        <option value="fra">French</option>
+        <option value="deu">German</option>
+        <option value="ita">Italian</option>
+        <option value="por">Portuguese</option>
+        <option value="nld">Dutch</option>
+        <option value="rus">Russian</option>
+        <option value="jpn">Japanese</option>
+        <option value="kor">Korean</option>
+        <option value="chi_sim">Simplified Chinese</option>
+        <option value="chi_tra">Traditional Chinese</option>
+        <option value="ara">Arabic</option>
+        <option value="hin">Hindi</option>
+        <option value="heb">Hebrew</option>
+      </select>
+    </div>
+    <div>
+      <h2>Result:</h2>
+      <div id="result"></div>
+    </div>
 
-      // Display the preview image
-      previewImage.src = imageData;
+    <script>
+      // Function to handle the image file selection
+      function handleImageSelect(event) {
+        var file = event.target.files[0];
 
-      // Process the image with OCR
-      const { data: { text } } = await worker.recognize(imageData);
-      result.innerText = text;
-    };
-  } catch (error) {
-    console.error(error);
-  }
-};
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var img = new Image();
+          img.onload = function () {
+            recognizeText(img, document.getElementById("languageSelect").value);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
 
-// Attach event listeners
-imageInput.addEventListener('change', processImage);
-languageSelect.addEventListener('change', processImage);
-ocrButton.addEventListener('click', processImage);
+      // Function to perform OCR on the image
+      async function recognizeText(img, lang) {
+        const { data: { text } } = await Tesseract.recognize(img, lang);
+        document.getElementById("result").innerText = text;
+      }
+
+      // Attach an event listener to the file input
+      document.getElementById("imageInput").addEventListener("change", handleImageSelect);
+
+      // Attach an event listener to the OCR button
+      document.getElementById("ocrButton").addEventListener("click", function () {
+        var img = new Image();
+        img.onload = function () {
+          recognizeText(img, document.getElementById("languageSelect").value);
+        };
+        img.src = document.getElementById("imageInput").files[0] ? URL.createObjectURL(document.getElementById("imageInput").files[0]) : "";
+      });
     </script>
+    <style>
+      #ocrButton {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+      }
+
+      #ocrButton:hover {
+        background-color: #3e8e41;
+      }
+    </style>
   </body>
 </html>
