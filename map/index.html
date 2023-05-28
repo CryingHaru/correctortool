@@ -21,11 +21,15 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
     <script>
-        var map = L.map('map').setView([51.505, -0.09], 13);
+             var map = L.map('map').setView([13.7942, -88.8965], 13);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
             maxZoom: 19,
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1,
+            attribution: 'by HC',
+            accessToken: 'pk.eyJ1IjoiaGNhYXNyIiwiYSI6ImNsaTZ5eHJ5czBrajMzZXI0MHNhaTI5aHAifQ.12WL0NkufrDv-MTn1GkKHg'
         }).addTo(map);
 
         var drawnItems = new L.FeatureGroup().addTo(map);
