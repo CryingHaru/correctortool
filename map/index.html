@@ -16,7 +16,7 @@
     <h1>TENGO HAMBRE SERGIO xd</h1>
     <div id="map"></div>
     <input type="file" id="customIconInput" onchange="loadCustomIcon(event)">
-    <button onclick="saveMapAsPNG()">Guardar mapa</button>
+    <button id="fullscreen-button" onclick="toggleFullScreen()">Pantalla completa pa la cap</button>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
@@ -66,37 +66,23 @@
             reader.readAsDataURL(file);
         }
 
-        function saveMapAsPNG() {
-            map.once('render', function () {
-                var mapCanvas = document.createElement('canvas');
-                var mapSize = map.getSize();
-                mapCanvas.width = mapSize.x;
-                mapCanvas.height = mapSize.y;
+        function toggleFullScreen() {
+            var elem = document.getElementById("map");
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                elem.requestFullscreen().catch(function (err) {
+                    alert('Error attempting to enable full-screen mode: ' + err.message);
+                });
+            }
+        }
 
-                var mapContext = mapCanvas.getContext('2d');
-                Array.prototype.forEach.call(
-                    document.querySelectorAll('.leaflet-layer'),
-                    function (layer) {
-                        if (layer.tagName !== 'CANVAS') {
-                            var layerCanvas = document.createElement('canvas');
-                            var layerSize = map.getSize();
-                            layerCanvas.width = layerSize.x;
-                            layerCanvas.height = layerSize.y;
+        document.addEventListener("fullscreenchange", function () {
+            var fullscreenElement = document.fullscreenElement;
+            var isFullScreen = fullscreenElement !== null;
+            document.getElementById("fullscreen-button").innerText = isFullScreen ? "Exit Full Screen" : "Full Screen Map";
+        });
 
-                            var layerContext = layerCanvas.getContext('2d');
-                            layerContext.drawImage(layer, 0, 0);
-
-                            mapContext.drawImage(layerCanvas, 0, 0);
-                        }
-                    }
-                );
-
-                var mapImage = mapCanvas.toDataURL('image/png');
-                var link = document.createElement('a');
-                link.href = mapImage;
-                link.download = 'map.png';
-                link.click();
-            });
             map.invalidateSize();
         }
     </script>
