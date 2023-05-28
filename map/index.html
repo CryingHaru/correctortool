@@ -62,8 +62,8 @@
                 var customIconUrl = e.target.result;
                 var customIcon = L.icon({
                     iconUrl: customIconUrl,
-                    iconSize: [32, 32], // Adjust the size of the icon as needed
-                    iconAnchor: [16, 32], // Adjust the anchor point of the icon as needed
+                    iconSize: [64, 64], // Adjust the size of the icon as needed
+                    iconAnchor: [32, 64], // Adjust the anchor point of the icon as needed
                 });
                 L.Draw.Marker.prototype.options.icon = customIcon;
             };
